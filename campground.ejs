@@ -1,0 +1,32 @@
+
+<% include partials/header.ejs %>
+<div class="container">
+    <div class="jumbotron">
+      <h1>WELCOME TO YELPCAMP!</h1>
+      <h6>best visiting places in india </h6>
+    <a class="btn btn-primary btn-lg" href="/campground/new">MAKE NEW CAMPGROUND</a>
+    </div>    
+
+    <div class="row">
+        <div class="col-lg-12">
+            our best cities in india 
+        </div>
+    </div>
+
+
+
+<div class="row" style="display:flex;flex-wrap:wrap;">
+<% campground.forEach(function(camp){ %>
+    <div class="col-md-3 col-sm-6">
+        <div class="thumbnail">
+           <img src="<%= camp.image %>">
+     <div class="caption">
+          <h4> <%= camp.name %> </h4>
+     </div>   
+    </div>  
+</div>
+<%  }); %>
+</div>
+
+<% include partials/footer.ejs %>
+</div>
