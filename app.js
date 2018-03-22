@@ -3,17 +3,22 @@ var app=express();
 var bodyparser=require("body-parser");
 var mongoose =require("mongoose");
 var Campground =require("./models/campground");
+var seedDb=require("./seed");
+var Comment=require("./models/comment");
+
+seedDb();
 
 mongoose.connect("mongodb://localhost/yelp_camp");
 
 app.use(bodyparser.urlencoded({extended:true}));
-app.set("view engine","ejs");
 
+app.set("view engine","ejs");
 
 app.get("/campground",function(req,res){
 Campground.find({},function(err,allcampgrounds){
 if(err)
-{console.log(err);
+{ 
+    console.log(err);
 }
 else{
     res.render("campground",{campground:allcampgrounds});
@@ -44,19 +49,53 @@ app.get("/campground/new",function(req,res){
 
 
 app.get("/campground/:id",function(req,res){
-Campground.findById(req.params.id,function(err,foundcampground){
+Campground.findById(req.params.id).populate("comments").exec(function(err,foundcampground){
 if(err)
 {console.log(err);
 }
 else{
     res.render("show",{campground:foundcampground});
+    console.log(foundcampground);
+}
+});
+});
+
+app.get("/campground/:id/comments/newcomment",function(req,res){
+Campground.findById(req.params.id,function(err,campground){
+if(err)
+{console.log(err);
+}else{
+    res.render("newcomment",{campground:campground});
 }
 });
 
 });
-app.get("*",function(req,res){
 
-res.send("sorry wrong page people");
+app.post("/campground/:id/comments",function(req,res){
+Campground.findById(req.params.id,function(err,campground){
+    if(err)
+    {console.log(err);
+    }
+    else{
+   Comment.create(req.body.comment,function(err,comment)
+    {
+     if(err)
+     {console.log(err);
+    }else{
+        campground.comments.push(comment);
+        campground.save();
+        res.redirect("/campground/"+req.params.id);
+    }
+
+    });
+    }
+});
+
+});
+
+
+app.get("*",function(req,res){
+    res.send("sorry wrong page people");
 });
 
 app.listen(8080,function(req,res)
